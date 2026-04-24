@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<!-- Leaflet CSS for Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<title>Rashmi & Nuwan | Cinematic Glitter Journey 2026</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0a0a0a;
+  color: #f5f0e8;
+  font-family: 'Montserrat', sans-serif;
+  overflow-x: hidden;
+  cursor: crosshair;
+}
+
+/* CINEMATIC GLITTER CANVAS (Mouse Trail Effect) */
+#glitterCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: screen;
+}
+
+/* TRAILER SCREEN */
+#trailer {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  animation: fadeIn 1s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+#trailer h1 {
+  font-family: 'Cormorant Garamond';
+  font-size: 3.8rem;
+  color: #d4af37;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+}
+
+#trailer p {
+  font-size: 1.2rem;
+  color: #ccc;
+  margin-bottom: 30px;
+  padding: 0 20px;
+}
+
+#trailer button {
+  margin-top: 20px;
+  padding: 14px 40px;
+  border: 2px solid #d4af37;
+  background: transparent;
+  color: #d4af37;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+#trailer button:hover {
+  background: #d4af37;
+  color: #000;
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+}
+
+/* HERO SECTION - SINGLE APPEARANCE (FIXED) */
+.hero {
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: url("assets/img/6.jpg") center/cover no-repeat;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7));
+  z-index: 1;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.6));
+  z-index: 2;
+}
+
+.hero-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 90%;
+  z-index: 3;
+}
+
+.hero-text h1 {
+  font-family: 'Cormorant Garamond';
+  font-size: 5rem;
+  color: #d4af37;
+  letter-spacing: 4px;
+  margin-bottom: 20px;
+  text-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
+
+.hero-text p {
+  font-size: 1.3rem;
+  letter-spacing: 2px;
+  color: #fff;
+  font-weight: 300;
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: bounce 2s infinite;
+  cursor: pointer;
+  z-index: 10;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(10px); }
+}
+
+/* EPISODE SECTIONS */
+.section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 80px 20px;
+  position: relative;
+  transition: 1s;
+  background: url("assets/img/4.jpg") center/cover no-repeat fixed;
+}
+
+.section:nth-child(even) {
+  background: linear-gradient(180deg, #0a0a0a 0%, #ac808f 100%);
+}
+
+.section h2 {
+  font-family: 'Cormorant Garamond';
+  font-size: 3rem;
+  color: #d4af37;
+  margin-bottom: 25px;
+}
+
+.section p {
+  font-size: 1.2rem;
+  max-width: 700px;
+  line-height: 1.8;
+  color: #ddd;
+}
+
+.section .date {
+  color: #d4af37;
+  font-size: 1.1rem;
+  margin-top: 20px;
+  letter-spacing: 2px;
+}
+
+/* VIDEO BREAK */
+.video-section {
+  background: #000;
+}
+
+.video-container {
+  width: 85%;
+  max-width: 900px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  margin-top: 30px;
+}
+
+.video-container video {
+  width: 100%;
+  display: block;
+}
+
+/* LOVE TIMELINE */
+.timeline {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 50px;
+  max-width: 1200px;
+}
+
+.timeline-card {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: 20px;
+  width: 240px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  transition: all 0.3s ease;
+}
+
+.timeline-card:hover {
+  transform: translateY(-10px);
+  border-color: #d4af37;
+  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
+}
+
+.timeline-card .year {
+  font-family: 'Cormorant Garamond';
+  font-size: 2rem;
+  color: #d4af37;
+  margin-bottom: 15px;
+}
+
+.timeline-card p {
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* GALLERY - FULLY OPTIMIZED FOR MOBILE */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.gallery-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  cursor: pointer;
+  aspect-ratio: 1 / 1;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  transition: transform 0.3s ease;
+}
+
+.gallery-item:hover {
+  transform: scale(1.02);
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: 0.5s;
+}
+
+.gallery-item:hover img {
+  transform: scale(1.1);
+}
+
+.gallery-item .overlay {
+  position: absolute;
+  bottom: -100%;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(transparent, rgba(0,0,0,0.85));
+  color: white;
+  padding: 20px;
+  transition: 0.3s;
+  text-align: center;
+}
+
+.gallery-item:hover .overlay {
+  bottom: 0;
+}
+
+/* MODAL FOR IMAGES */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.96);
+  z-index: 10001;
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(8px);
+}
+
+.modal img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 12px;
+  border: 2px solid rgba(212,175,55,0.5);
+  box-shadow: 0 0 40px rgba(0,0,0,0.8);
+}
+
+/* WEDDING DETAILS */
+.wedding-details {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 35px;
+  margin: 40px 0;
+}
+
+.detail-card {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(5px);
+  padding: 25px;
+  border-radius: 20px;
+  min-width: 180px;
+  transition: transform 0.2s;
+  border: 1px solid rgba(212,175,55,0.2);
+}
+
+.detail-card:hover {
+  transform: scale(1.02);
+  border: 1px solid rgba(212,175,55,0.6);
+  background: rgba(255,255,255,0.08);
+}
+
+/* COUNTDOWN */
+.countdown {
+  display: flex;
+  gap: 25px;
+  justify-content: center;
+  margin: 40px 0;
+  flex-wrap: wrap;
+}
+
+.countdown-item {
+  text-align: center;
+  background: rgba(212, 175, 55, 0.12);
+  backdrop-filter: blur(4px);
+  padding: 20px;
+  border-radius: 20px;
+  min-width: 100px;
+  border: 1px solid rgba(212,175,55,0.3);
+}
+
+.countdown-number {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #d4af37;
+  font-family: 'Montserrat', monospace;
+  text-shadow: 0 0 5px rgba(212,175,55,0.5);
+}
+
+.countdown-label {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 8px;
+  color: #ddd;
+}
+
+/* BUTTONS */
+button {
+  margin-top: 30px;
+  padding: 14px 42px;
+  border: 2px solid #d4af37;
+  background: transparent;
+  color: #d4af37;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+}
+
+button:hover {
+  background: #d4af37;
+  color: #000;
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.6);
+}
+
+/* SCROLL REVEAL */
+.hidden {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+}
+
+.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ========== MOBILE & TABLET OPTIMIZATIONS ========== */
+@media (max-width: 900px) {
+  .hero-text h1 { font-size: 3.5rem; letter-spacing: 3px; }
+  .hero-text p { font-size: 1.1rem; }
+  .section h2 { font-size: 2.5rem; }
+  .section p { font-size: 1rem; }
+  .timeline-card { width: 200px; padding: 20px; }
+  .countdown-item { min-width: 80px; padding: 15px; }
+  .countdown-number { font-size: 2.2rem; }
+}
+
+@media (max-width: 768px) {
+  .hero-text h1 { font-size: 2.8rem; }
+  .hero-text p { font-size: 1rem; }
+  .section h2 { font-size: 2rem; }
+  .video-container { width: 95%; }
+  .timeline-card { width: 180px; padding: 18px; }
+  .timeline-card .year { font-size: 1.5rem; }
+  .detail-card { min-width: 150px; padding: 18px; }
+  .gallery { padding: 20px; gap: 15px; }
+}
+
+/* PERFECT MOBILE GALLERY LAYOUT */
+@media (max-width: 640px) {
+  .gallery {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 16px;
+  }
+  
+  .gallery-item .overlay p {
+    font-size: 0.8rem;
+    padding: 8px;
+  }
+  
+  .countdown {
+    gap: 12px;
+  }
+  
+  .countdown-item {
+    min-width: 65px;
+    padding: 12px 8px;
+  }
+  
+  .countdown-number {
+    font-size: 1.8rem;
+  }
+  
+  .countdown-label {
+    font-size: 0.7rem;
+  }
+  
+  .direction-buttons {
+    gap: 10px;
+  }
+  
+  .glow-btn {
+    padding: 8px 16px;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-text h1 { font-size: 2.2rem; }
+  .section h2 { font-size: 1.8rem; }
+  .timeline-card { width: 160px; padding: 15px; }
+  .timeline-card p { font-size: 0.8rem; }
+  .gallery {
+    gap: 10px;
+    padding: 12px;
+  }
+  .gallery-item .overlay { padding: 12px; }
+  .gallery-item .overlay p { font-size: 0.7rem; }
+}
+
+/* CINEMATIC FOOTER */
+.cinematic-footer {
+  padding: 100px 20px 60px;
+  text-align: center;
+  background: radial-gradient(circle at top, rgba(212,175,55,0.1), #0a0a0a 70%);
+  border-top: 1px solid rgba(212,175,55,0.25);
+}
+
+.cinematic-footer h2 {
+  font-family: 'Cormorant Garamond';
+  font-size: 2.8rem;
+  color: #d4af37;
+  margin-bottom: 15px;
+}
+
+.cinematic-footer p {
+  color: #ccc;
+  margin-bottom: 35px;
+  font-size: 1.1rem;
+}
+
+.direction-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 40px;
+}
+
+.glow-btn {
+  padding: 12px 24px;
+  border-radius: 50px;
+  border: 2px solid #d4af37;
+  color: #d4af37;
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: 1px;
+  transition: 0.3s ease;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.glow-btn:hover {
+  background: #d4af37;
+  color: #000;
+  transform: translateY(-3px);
+  box-shadow: 0 0 20px rgba(212,175,55,0.5);
+}
+
+.footer-note {
+  margin-top: 30px;
+  color: #888;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+}
+
+#map {
+  width: 100%;
+  max-width: 1000px;
+  height: 400px;
+  margin: 25px auto;
+  border-radius: 24px;
+  border: 1px solid rgba(212,175,55,0.4);
+  box-shadow: 0 0 30px rgba(0,0,0,0.6);
+  overflow: hidden;
+}
+
+.map-btn {
+  margin-bottom: 20px;
+  padding: 10px 28px;
+  font-size: 0.9rem;
+}
+
+.leaflet-container {
+  background: #0a0a0a !important;
+  border-radius: 24px;
+}
+
+.map-section {
+  position: relative;
+  margin-top: 20px;
+}
+
+.map-section h3 {
+  color: #d4af37;
+  font-family: 'Cormorant Garamond';
+  font-size: 1.8rem;
+  margin-bottom: 5px;
+}
+
+</style>
+</head>
+<body>
+
+<!-- GLITTER TRAIL CANVAS -->
+<canvas id="glitterCanvas"></canvas>
+
+<!-- TRAILER MODAL -->
+<div id="trailer">
+  <h1>Rashmi ♥ Nuwan</h1>
+  <p>A Cinematic Wedding Story | Forever Begins 2026</p>
+  <button onclick="startFilm()">▶ Begin Journey</button>
+</div>
+
+<!-- HERO SECTION - SINGLE OCCURRENCE (Fixed duplicate issue) -->
+<section class="hero">
+  <div class="hero-overlay"></div>
+  <div class="hero-text">
+    <h1>Rashmi & Nuwan</h1>
+    <p>Two Souls, One Love Story</p>
+  </div>
+  <div class="scroll-indicator" onclick="window.scrollTo({top: window.innerHeight, behavior: 'smooth'})">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2">
+      <path d="M12 5v14M19 12l-7 7-7-7"/>
+    </svg>
+  </div>
+</section>
+
+<!-- EPISODE 1 - HOW WE MET -->
+<section class="section hidden" style="background: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1516589091380-5d8e87f6999b?w=1400') center/cover fixed;">
+  <h2>Episode I — Destiny Calls</h2>
+  <p>"It wasn't chance that brought us together, it was the universe writing our story."</p>
+  <div class="date">✨ First Meeting · March 15, 2019 ✨</div>
+  
+</section>
+
+<!-- VIDEO BREAK - PROPOSAL MOMENT -->
+<section class="section video-section hidden">
+  <h2>The Proposal</h2>
+  <p>A moment that changed everything forever</p>
+  <div class="video-container">
+    <video controls poster="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800">
+      <source src="https://cdn.coverr.co/videos/coverr-couple-walking-on-beach-1558/1080p.mp4" type="video/mp4">
+      Your browser does not support video playback.
+    </video>
+  </div>
+</section>
+
+<!-- EPISODE 2 - LOVE TIMELINE -->
+<section class="section hidden">
+  <h2>Episode II — Our Journey</h2>
+  <p>Every chapter of our story has been written with love, laughter, and endless memories.</p>
+  <div class="timeline">
+    <div class="timeline-card">
+      <div class="year">2019</div>
+      <p>First date at the old bookstore. We talked for 6 hours and didn't want to leave.</p>
+    </div>
+    <div class="timeline-card">
+      <div class="year">2020</div>
+      <p>Through lockdowns and distance, our love only grew stronger.</p>
+    </div>
+    <div class="timeline-card">
+      <div class="year">2022</div>
+      <p>Nuwan proposed under starry skies. She said yes! 💍</p>
+    </div>
+    <div class="timeline-card">
+      <div class="year">2026</div>
+      <p>The day we become one. Forever starts now.</p>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY - ROMANTIC MOMENTS (FULLY MOBILE RESPONSIVE) -->
+<section class="section hidden">
+  <h2>Episode III — Gallery of Hearts</h2>
+  <p>Capturing the light in every moment we share</p>
+  <div class="gallery" id="gallery"></div>
+</section>
+
+<!-- WEDDING DETAILS -->
+<section class="section hidden">
+  <h2>Episode IV — The Celebration</h2>
+  <div class="wedding-details">
+    <div class="detail-card">
+      <div style="font-size: 2.2rem;">📅</div>
+      <p><strong>Date</strong><br>December 15, 2026</p>
+    </div>
+    <div class="detail-card">
+      <div style="font-size: 2.2rem;">⏰</div>
+      <p><strong>Time</strong><br>4:00 PM - 11:00 PM</p>
+    </div>
+    <div class="detail-card">
+      <div style="font-size: 2.2rem;">📍</div>
+      <p><strong>Venue</strong><br>Royal Oceanic Resort, Galle</p>
+    </div>
+    <div class="detail-card">
+      <div style="font-size: 2.2rem;">👗</div>
+      <p><strong>Dress Code</strong><br>Formal / Traditional</p>
+    </div>
+  </div>
+  
+  <div class="countdown" id="countdown">
+    <div class="countdown-item"><div class="countdown-number" id="days">00</div><div class="countdown-label">Days</div></div>
+    <div class="countdown-item"><div class="countdown-number" id="hours">00</div><div class="countdown-label">Hours</div></div>
+    <div class="countdown-item"><div class="countdown-number" id="minutes">00</div><div class="countdown-label">Minutes</div></div>
+    <div class="countdown-item"><div class="countdown-number" id="seconds">00</div><div class="countdown-label">Seconds</div></div>
+  </div>
+</section>
+
+<!-- FINAL INVITATION -->
+<section class="section hidden">
+  <h2>We Invite You</h2>
+  <p>"Love is not about how many days, months, or years you have been together. It is about how much you truly love each other every single day."</p>
+  <p style="margin-top: 25px; font-size: 1.2rem; font-style: italic;">Join us as we begin our forever 💛</p>
+  <button onclick="sendRSVP()">✨ Confirm Attendance ✨</button>
+  <div class="date" style="margin-top: 45px;">#RashmiAndNuwan #TyingTheKnot</div>
+</section>
+
+<!-- IMAGE MODAL -->
+<div id="imageModal" class="modal" onclick="closeModal()">
+  <img id="modalImage" src="" alt="">
+</div>
+
+<!-- CINEMATIC FOOTER -->
+<footer class="cinematic-footer hidden">
+  <h2>Find Your Way to Our Story</h2>
+  <p>We can't wait to celebrate with you 💛</p>
+
+  <div class="direction-buttons">
+    <a class="glow-btn" href="https://www.google.com/maps/search/?api=1&query=Royal+Oceanic+Resort+Galle+Sri+Lanka" target="_blank" rel="noopener noreferrer">🗺️ Google Maps</a>
+    <a class="glow-btn" href="https://www.waze.com/ul?q=Royal%20Oceanic%20Resort%20Galle%20Sri%20Lanka&navigate=yes" target="_blank" rel="noopener noreferrer">🧭 Waze</a>
+    <a class="glow-btn" href="https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=Royal%20Oceanic%20Resort%2C%20Galle%2C%20Sri%20Lanka" target="_blank" rel="noopener noreferrer">🚖 Uber</a>
+    <a class="glow-btn" href="https://pickme.lk/" target="_blank" rel="noopener noreferrer">🇱🇰 PickMe</a>
+  </div>
+
+  <div class="footer-note">
+    ✨ Tap a button to travel straight into our love story ✨
+  </div>
+  
+  <!-- CINEMATIC MAP -->
+  <div class="map-section">
+    <h3>🗺️ Journey to Our Wedding</h3>
+    <p>Follow your path to forever 💛</p>
+    <button class="map-btn" onclick="locateUser()">📍 You Are Here</button>
+    <div id="map"></div>
+  </div>
+</footer>
+
+<script>
+// ========================
+// CINEMATIC GLITTER TRAIL (Enhanced)
+// ========================
+const canvas = document.getElementById('glitterCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let lastX = 0, lastY = 0;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+class GlitterParticle {
+  constructor(x, y, vx, vy) {
+    this.x = x; this.y = y;
+    this.vx = vx || (Math.random() - 0.5) * 3.5;
+    this.vy = vy || (Math.random() - 0.5) * 3 - 2;
+    this.size = Math.random() * 5 + 1.5;
+    this.alpha = 1;
+    this.decay = 0.018 + Math.random() * 0.03;
+    this.color = `hsl(${45 + Math.random() * 35}, 100%, 65%)`;
+    this.life = 1;
+  }
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.vy += 0.1;
+    this.life -= this.decay;
+    this.alpha = this.life;
+    return this.life > 0;
+  }
+  draw(ctx) {
+    ctx.save();
+    ctx.globalAlpha = this.alpha * 0.9;
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#ffdf80';
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    if (this.size > 2.8) {
+      for (let i = 0; i < 5; i++) {
+        const angle = (i * 72 - 90) * Math.PI / 180;
+        const rad = this.size * 0.65;
+        const x1 = this.x + Math.cos(angle) * rad;
+        const y1 = this.y + Math.sin(angle) * rad;
+        if (i === 0) ctx.moveTo(x1, y1);
+        else ctx.lineTo(x1, y1);
+        const angle2 = (i * 72 + 36 - 90) * Math.PI / 180;
+        const rad2 = this.size * 0.35;
+        const x2 = this.x + Math.cos(angle2) * rad2;
+        const y2 = this.y + Math.sin(angle2) * rad2;
+        ctx.lineTo(x2, y2);
+      }
+      ctx.fill();
+    } else {
+      ctx.arc(this.x, this.y, this.size * 0.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+}
+
+function addGlitterBurst(x, y, intensity = 12) {
+  if (!x || !y) return;
+  const count = intensity + Math.floor(Math.random() * 10);
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = Math.random() * 3 + 1;
+    const vx = Math.cos(angle) * speed * (Math.random() * 1.6);
+    const vy = Math.sin(angle) * speed * (Math.random() * 1.6) - 1.8;
+    particles.push(new GlitterParticle(x, y, vx, vy));
+  }
+}
+
+document.addEventListener('mousemove', (e) => {
+  addGlitterBurst(e.clientX, e.clientY, 5);
+  lastX = e.clientX; lastY = e.clientY;
+});
+document.body.addEventListener('click', (e) => addGlitterBurst(e.clientX, e.clientY, 24));
+
+function animateGlitter() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.globalCompositeOperation = 'lighter';
+  for (let i = particles.length-1; i >= 0; i--) {
+    if (!particles[i].update()) particles.splice(i,1);
+    else particles[i].draw(ctx);
+  }
+  ctx.globalCompositeOperation = 'source-over';
+  requestAnimationFrame(animateGlitter);
+}
+animateGlitter();
+
+// Background ambient sparks
+setInterval(() => {
+  if (particles.length < 180) {
+    for (let i = 0; i < 6; i++) {
+      const randX = Math.random() * canvas.width;
+      const randY = canvas.height - Math.random() * 100;
+      particles.push(new GlitterParticle(randX, randY, (Math.random() - 0.5)*1.5, -Math.random()*2 - 0.8));
+    }
+  }
+}, 2000);
+
+// ========================
+// GALLERY WITH MOBILE-OPTIMIZED IMAGES
+// ========================
+const galleryImages = [
+  "assets/img/1.jpg",
+  "assets/img/2.jpg",
+  "assets/img/3.jpg",
+  "assets/img/4.jpg",
+  "assets/img/5.jpg",
+  "assets/img/6.jpg",
+  "assets/img/7.jpg",
+  "assets/img/8.jpg"
+];
+const captions = ["First Sunset", "Coffee Dates", "Starry Night", "Laughing Together", "Dancing Under Stars", "Morning Light", "Adventure Awaits", "Forever Us"];
+
+function loadGallery() {
+  const galleryContainer = document.getElementById('gallery');
+  if (!galleryContainer) return;
+  galleryImages.forEach((imgSrc, index) => {
+    const div = document.createElement('div');
+    div.className = 'gallery-item';
+    div.innerHTML = `<img src="${imgSrc}" alt="Romantic moment ${index+1}" loading="lazy"><div class="overlay"><p>${captions[index % captions.length]}</p></div>`;
+    div.onclick = () => openModal(imgSrc);
+    galleryContainer.appendChild(div);
+  });
+}
+
+function openModal(imgSrc) {
+  const modal = document.getElementById('imageModal');
+  const modalImg = document.getElementById('modalImage');
+  modal.style.display = 'flex';
+  modalImg.src = imgSrc;
+  addGlitterBurst(window.innerWidth/2, window.innerHeight/2, 35);
+}
+function closeModal() { document.getElementById('imageModal').style.display = 'none'; }
+
+// COUNTDOWN TIMER
+function updateCountdown() {
+  const weddingDate = new Date(2026, 11, 15, 16, 0, 0).getTime();
+  const now = new Date().getTime();
+  const distance = weddingDate - now;
+  if (distance < 0) {
+    ['days','hours','minutes','seconds'].forEach(id => document.getElementById(id).innerText = '00');
+    return;
+  }
+  document.getElementById('days').innerText = String(Math.floor(distance / (1000*60*60*24))).padStart(2,'0');
+  document.getElementById('hours').innerText = String(Math.floor((distance % (86400000)) / 3600000)).padStart(2,'0');
+  document.getElementById('minutes').innerText = String(Math.floor((distance % 3600000) / 60000)).padStart(2,'0');
+  document.getElementById('seconds').innerText = String(Math.floor((distance % 60000) / 1000)).padStart(2,'0');
+}
+
+function startFilm() {
+  document.getElementById("trailer").style.display = "none";
+  if (window.speechSynthesis) {
+    const speech = new SpeechSynthesisUtterance("Welcome to the love story of Rashmi and Nuwan. A journey written by destiny, coming together on December 15th, 2026.");
+    speech.rate = 0.85; speech.pitch = 1.2;
+    window.speechSynthesis.speak(speech);
+  }
+  for(let i=0;i<50;i++) setTimeout(() => addGlitterBurst(window.innerWidth/2, window.innerHeight/2, 6), i*25);
+}
+
+const hiddenSections = document.querySelectorAll('.hidden');
+function checkScroll() {
+  hiddenSections.forEach(sec => {
+    const rect = sec.getBoundingClientRect();
+    if (rect.top < window.innerHeight - 80) sec.classList.add('show');
+  });
+}
+window.addEventListener('scroll', checkScroll);
+window.addEventListener('load', () => { checkScroll(); loadGallery(); updateCountdown(); setInterval(updateCountdown, 1000); });
+function sendRSVP() { window.open("https://wa.me/94768335677?text=" + encodeURIComponent("💛 I will be attending Rashmi & Nuwan's wedding celebration on December 15th, 2026! Can't wait! 💛")); addGlitterBurst(window.innerWidth/2, window.innerHeight/2, 30); }
+
+// MAP
+let map, userMarker, routeLine;
+const venue = { lat: 6.0535, lng: 80.2210 };
+function initMap() {
+  map = L.map('map').setView([venue.lat, venue.lng], 14);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+  const venueIcon = L.divIcon({ html: '💛', iconSize: [30,30], className: 'venue-glow' });
+  L.marker([venue.lat, venue.lng], { icon: venueIcon }).addTo(map).bindPopup("💛 Wedding Venue");
+}
+async function locateUser() {
+  if (!navigator.geolocation) return alert("Geolocation not supported");
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    const userLat = pos.coords.latitude, userLng = pos.coords.longitude;
+    if (userMarker) map.removeLayer(userMarker);
+    userMarker = L.marker([userLat, userLng]).addTo(map).bindPopup("📍 You Are Here").openPopup();
+    map.flyTo([userLat, userLng], 12);
+    const url = `https://router.project-osrm.org/route/v1/driving/${userLng},${userLat};${venue.lng},${venue.lat}?overview=full&geometries=geojson`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+    if (routeLine) map.removeLayer(routeLine);
+    routeLine = L.polyline(coords, { color: "#d4af37", weight: 4, opacity: 0.9 }).addTo(map);
+    map.fitBounds(routeLine.getBounds(), { padding: [50,50] });
+  });
+}
+window.addEventListener("load", initMap);
+</script>
+</body>
+</html>
